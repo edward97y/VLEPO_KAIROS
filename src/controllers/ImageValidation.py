@@ -13,7 +13,7 @@ class ImageValidation(BaseControllers):
     async def image_type_validation(self):
 
         content_type=self.image.content_type
-        print(content_type)
+     
         if content_type not in self.settings.IMAGE_TYPE:
             return False
         return True
