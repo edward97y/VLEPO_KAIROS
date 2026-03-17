@@ -3,3 +3,10 @@ pandas==3.0.1
 matplot==0.1.9
 seaborn==0.13.2
 scikit-learn==1.8.0
+fastapi==0.135.1
+uvicorn==0.41.0
+pydantic-settings==2.13.1
+python-multipart==0.0.22
+opencv-python==4.13.0.92
+tensorflow==2.21.0
+joblib==1.5.3
