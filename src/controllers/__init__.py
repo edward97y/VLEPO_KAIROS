@@ -1,1 +1,2 @@
 from .ImageValidation import ImageValidation
+from .FeatureValidation import FeatureValidation
