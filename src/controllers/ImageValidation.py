@@ -14,7 +14,7 @@ class ImageValidation(BaseControllers):
 
         content_type=self.image.content_type
      
-        if content_type not in self.settings.IMAGE_TYPE:
+        if content_type not in self.settings.EYE_IMAGE_TYPE:
             return False
         return True
     
@@ -22,7 +22,7 @@ class ImageValidation(BaseControllers):
 
         image_size=self.image.size
 
-        if image_size > (self.settings.IMAGE_SIZE*self.BYTES_IN_MB):
+        if image_size > (self.settings.EYE_IMAGE_SIZE*self.BYTES_IN_MB):
             return False 
         return True
     
@@ -33,7 +33,7 @@ class ImageValidation(BaseControllers):
         except Exception as e:
             return f"error when open an image :{e}"
         width, height = img.size
-        if width<self.settings.IMAGE_DIMENSION[0] or height<self.settings.IMAGE_DIMENSION[1]:
+        if width<self.settings.EYE_IMAGE_DIMENSION[0] or height<self.settings.EYE_IMAGE_DIMENSION[1]:
             return False
         return True
     

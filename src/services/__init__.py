@@ -1,1 +1,2 @@
 from .DeepEyeClassifier import DeepEyeClassifier
+from .MachineEyeClassifier import MachineEyeClassifier
