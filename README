@@ -5,24 +5,27 @@
 ### Create New Environment
 1) python -m venv vlepo
 2) activate the env using: 
-$ source vlepo/bin/activate
+$source vlepo/bin/activate
 
 ## Installation 
 
 ### Install the required packages
-$ pip install -r requirements.txt
+$pip install -r requirements.txt
 
+#install postgresql  by using 
+
+$sudo apt install postgresql
 ### setup the environment variable
-$ cp .env.example .env
+$cp .env.example .env
 
 
 ## Run the FastAPI Server
 uvicorn main:app --reload --host 0.0.0.0 --port 5000
 
 ##Run Docker Compose Services
-$ cd docker
-$ cp .env.example .env
+$cd docker
+$cp .env.example .env
 
 ## update .env with your credentials
-$ cd docker
-$ sudo docker compose up -d
+$cd docker
+$sudo docker compose up -d

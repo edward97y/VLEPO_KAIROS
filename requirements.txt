@@ -8,3 +8,5 @@ python-multipart==0.0.22
 opencv-python==4.13.0.92
 tensorflow==2.21.0
 joblib==1.5.3
+SQLAlchemy==2.0.48
+asyncpg==0.31.0
