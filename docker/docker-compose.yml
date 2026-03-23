@@ -1,0 +1,19 @@
+services:
+  postgresql:
+   image: pgvector/pgvector:0.8.2-pg18-trixie
+   container_name: pgvector
+   ports:
+    - "5432:5432"
+   volumes:
+    - postgresdata:/var/lib/postgresql/18/main
+   environment:
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+   networks:
+    - backend
+   restart: always
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgresdata:
