@@ -5,10 +5,18 @@
 ### Create New Environment
 1) python -m venv vlepo
 2) activate the env using: 
-$source vlepo/bin/activate
-
+```bash
+$ source vlepo/bin/activate
+```
 ## Installation 
 
+
+### if you are linux user you must do this first
+
+```bash
+$ sudo apt update
+$ sudo apt install libpq-dev gcc python3-dev
+```
 ### Install the required packages
 ```bash
 $ pip install -r requirements.txt
