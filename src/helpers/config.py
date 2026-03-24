@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     #Machine learning model for eye classification
     EYE_MACHINE_MODEL_PATH:str
     EYE_DISEASES_CLASS_LIST_MACHINE_MODEL:list[str]
+    #Postgres database config
+    POSTGRES_USERNAME:str
+    POSTGRES_PASSWORD:str
+    POSTGRES_HOST:str
+    POSTGRES_PORT:int
+    POSTGRES_EYE_DATABASE:str
 
     model_config = SettingsConfigDict(env_file=".env")
 
