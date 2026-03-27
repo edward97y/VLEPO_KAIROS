@@ -6,10 +6,16 @@ class Settings(BaseSettings):
     EYE_IMAGE_DIMENSION:tuple[int,int]
     
    # deep eye model
-    EYE_CLASSIFIER_MODEL_PATH:str
-    EYE_DISEASES_MODEL_PATH:str
-    EYE_CLASS_LIST:list[str]
-    EYE_DISEASES_CLASS_LIST:list[str]
+    ## BINARY EYE MODEL
+    BINARY_DEEP_EYE_CLASSIFIER_PATH:str
+    BINARY_DEEP_EYE_CLASSIFIER_CLASS_LIST:list[str]
+    BINARY_DEEP_EYE_CLASSIFIER_VERSION:str
+    BINARY_DEEP_EYE_CLASSIFIER_NAME:str
+    ## MULTI EYE MODEL
+    MULTI_DEEP_EYE_CLASSIFIER_PATH:str
+    MULTI_DEEP_EYE_CLASSIFIER_CLASS_LIST:list[str]
+    MULTI_DEEP_EYE_CLASSIFIER_VERSION:str
+    MULTI_DEEP_EYE_CLASSIFIER_NAME:str
 
 
     #Machine eye validation
@@ -25,6 +31,8 @@ class Settings(BaseSettings):
     #Machine learning model for eye classification
     EYE_MACHINE_MODEL_PATH:str
     EYE_DISEASES_CLASS_LIST_MACHINE_MODEL:list[str]
+    EYE_MACHINE_MODEL_VERSION:str
+    EYE_MACHINE_MODEL_NAME:str
     #Postgres database config
     POSTGRES_USERNAME:str
     POSTGRES_PASSWORD:str
