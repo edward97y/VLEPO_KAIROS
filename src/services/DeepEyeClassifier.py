@@ -55,15 +55,16 @@ class DeepEyeClassifier(Model_interface):
         return img
     
     async def predict(self,data,request:Request):
-        binary_class_prob=request.app.deep_eye_classifier.predict(data)
+        binary_class_prob=request.app.binary_deep_eye_classifier.predict(data)
         class_index=int(np.argmax(binary_class_prob))
-        classes=self.settings.EYE_CLASS_LIST
+        classes=self.settings.BINARY_DEEP_EYE_CLASSIFIER_CLASS_LIST
         class_predict=classes[class_index]
         confidence=float(np.max(binary_class_prob))
+        
         if class_predict=="Diabetic Retinopathy":
-            all_classes_prob=request.app.deep_eye_diseases(data)
+            all_classes_prob=request.app.multi_deep_eye_classifier(data)
             class_index=int(np.argmax(all_classes_prob))
-            classes=self.settings.EYE_DISEASES_CLASS_LIST
+            classes=self.settings.MULTI_DEEP_EYE_CLASSIFIER_CLASS_LIST
             class_predict=classes[class_index]
             confidence=float(np.max(all_classes_prob))
         return class_predict,confidence
