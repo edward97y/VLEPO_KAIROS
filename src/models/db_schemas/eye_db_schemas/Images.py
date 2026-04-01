@@ -10,7 +10,7 @@ class Images(SqlBaseModel):
     Uploaded_at=Column(DateTime(timezone=True),nullable=False,server_default=func.now())
     image_type=Column(String,nullable=False)
     image_path=Column(String,nullable=False)
-    grad_cam_image_path=Column(String,nullable=False)
+    grad_cam_image_path=Column(String,nullable=True)
     
 
     Image_Session_id=Column(UUID(as_uuid=True),ForeignKey("sessions.Session_id"),nullable=False)

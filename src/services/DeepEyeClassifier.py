@@ -5,11 +5,16 @@ from fastapi import Request
 from helpers.config import get_settings
 import io
 from PIL import Image
+from .db_service import PredictionResultService,ImageService
+from uuid import UUID
+import tensorflow as tf
 class DeepEyeClassifier(Model_interface):
-    def __init__(self,content):
+    def __init__(self,content,db_client:object,session_id:UUID):
         self.content=content
         self.settings=get_settings()
-
+        self.prediction_service=PredictionResultService(db_client=db_client,session_id=session_id)
+        self.image_service=ImageService(db_client=db_client,session_id=session_id)
+        
     async def retina(self):
         image =  np.array(Image.open(io.BytesIO(self.content)))
         img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -52,9 +57,49 @@ class DeepEyeClassifier(Model_interface):
         img=await self.apply_clahe(img)
         img=await self.normalize_image(img)
         img= np.expand_dims(img, axis=0)# add batch dim to the image
-        return img
+        
+        image_for_save=np.squeeze(img, axis=0) 
+        image_for_save=(image_for_save * 255).astype("uint8")
+        result=await self.image_service.insert_image_info(image=image_for_save)
+        
+        return img,result.Image_id
+    async def generate_gradcam(self, grad_model, image):
+
+
+        with tf.GradientTape() as tape:
+            conv_outputs, predictions = grad_model(image)
+            predictions=predictions[0]
+            class_index = tf.argmax(predictions[0])
+            loss = predictions[:, class_index]
     
-    async def predict(self,data,request:Request):
+        grads = tape.gradient(loss, conv_outputs)
+    
+        pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+        conv_outputs = conv_outputs[0]
+    
+        heatmap = conv_outputs @ pooled_grads[..., tf.newaxis]
+        heatmap = tf.squeeze(heatmap)
+    
+        heatmap = tf.maximum(heatmap, 0) / tf.reduce_max(heatmap)
+    
+        return heatmap.numpy()
+    async def create_gradcam_image(self, heatmap, image):
+    
+
+        image = np.squeeze(image, axis=0)
+        image = (image * 255).astype("uint8")
+
+        heatmap = cv2.resize(heatmap, (image.shape[1], image.shape[0]))
+        heatmap = np.uint8(255 * heatmap)
+
+        heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+
+        result = cv2.addWeighted(image, 0.6, heatmap, 0.4, 0)
+
+        return result
+
+
+    async def predict(self,data,image_id:UUID,request:Request):
         binary_class_prob=request.app.binary_deep_eye_classifier.predict(data)
         class_index=int(np.argmax(binary_class_prob))
         classes=self.settings.BINARY_DEEP_EYE_CLASSIFIER_CLASS_LIST
@@ -67,4 +112,30 @@ class DeepEyeClassifier(Model_interface):
             classes=self.settings.MULTI_DEEP_EYE_CLASSIFIER_CLASS_LIST
             class_predict=classes[class_index]
             confidence=float(np.max(all_classes_prob))
-        return class_predict,confidence
+            result=await self.prediction_service.insert_deep_model_predict(prediction_value=class_predict,confidence_score=confidence,
+                                                                 model_name=self.settings.MULTI_DEEP_EYE_CLASSIFIER_NAME,
+                                                                 model_version=self.settings.MULTI_DEEP_EYE_CLASSIFIER_VERSION,
+                                                                 image_id=image_id)
+            grad_cam=await self.generate_gradcam(grad_model=request.app.binary_grad_model,image=data)
+            grad_cam_image=await self.create_gradcam_image(heatmap=grad_cam,image=data)
+            im_result=await self.image_service.update_grad_cam(image_id=image_id,grad_cam_image=grad_cam_image)
+
+        else:
+            result=await self.prediction_service.insert_deep_model_predict(prediction_value=class_predict,confidence_score=confidence,
+                                                                 model_name=self.settings.BINARY_DEEP_EYE_CLASSIFIER_NAME,
+                                                                 model_version=self.settings.BINARY_DEEP_EYE_CLASSIFIER_VERSION,
+                                                                 image_id=image_id)
+            grad_cam=await self.generate_gradcam(grad_model=request.app.multi_grad_model,image=data)
+            grad_cam_image=await self.create_gradcam_image(heatmap=grad_cam,image=data)
+            im_result=await self.image_service.update_grad_cam(image_id=image_id,grad_cam_image=grad_cam_image)
+        
+        predict_result={"prediction_id":str(result.Prediction_id),"model_name":result.model_name,
+                        "prediction_value":result.prediction_value,"model_version":result.model_version,
+                        "confidence_score":result.confidence_score,"created_at":str(result.created_at),
+                        "prediction_session_id":str(result.Prediction_Session_id),"prediction_image_id":str(result.Prediction_Image_id)}
+        
+
+        image_result={"image_id":str(im_result.Image_id),"uploaded_at":str(im_result.Uploaded_at),
+                      "image_type":im_result.image_type,"image_path":im_result.image_path,
+                      "grad_cam_image_path":im_result.grad_cam_image_path,"image_session_id":str(im_result.Image_Session_id)}
+        return predict_result,image_result

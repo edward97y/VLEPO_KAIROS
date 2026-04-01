@@ -1,2 +1,3 @@
 from .UserFeatureService import UserFeatureService
 from .PredictionResultService import PredictionResultService
+from .ImageService import ImageService

@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     MULTI_DEEP_EYE_CLASSIFIER_CLASS_LIST:list[str]
     MULTI_DEEP_EYE_CLASSIFIER_VERSION:str
     MULTI_DEEP_EYE_CLASSIFIER_NAME:str
+    LAST_CONV_LAYER:str
 
 
     #Machine eye validation

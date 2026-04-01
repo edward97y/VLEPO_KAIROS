@@ -17,9 +17,23 @@ async def lifespan(app:FastAPI):
     app.db_client=sessionmaker(bind=app.db_engin,class_=AsyncSession,expire_on_commit=False)
 
     #models
-    #app.binary_deep_eye_classifier=models.load_model(settings.BINARY_DEEP_EYE_CLASSIFIER_PATH)
-    #app.multi_deep_eye_classifier=models.load_model(settings.MULTI_DEEP_EYE_CLASSIFIER_PATH)
+    app.binary_deep_eye_classifier=models.load_model(settings.BINARY_DEEP_EYE_CLASSIFIER_PATH)
+    app.multi_deep_eye_classifier=models.load_model(settings.MULTI_DEEP_EYE_CLASSIFIER_PATH)
     app.machine_eye_classifier=joblib.load(settings.EYE_MACHINE_MODEL_PATH)
+    app.binary_grad_model = models.Model(
+    inputs=app.binary_deep_eye_classifier.input,
+    outputs=[
+        app.binary_deep_eye_classifier.get_layer(settings.LAST_CONV_LAYER).output,
+        app.binary_deep_eye_classifier.output
+    ]
+)
+    app.multi_grad_model = models.Model(
+        inputs=app.multi_deep_eye_classifier.input,
+        outputs=[
+            app.multi_deep_eye_classifier.get_layer(settings.LAST_CONV_LAYER).output,
+            app.multi_deep_eye_classifier.output
+        ]
+    )
     yield
 
     app.db_engin.dispose()

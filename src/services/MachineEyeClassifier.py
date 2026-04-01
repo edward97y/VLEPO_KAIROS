@@ -51,6 +51,6 @@ class MachineEyeClassifier(Model_interface):
                        "prediction_value":result.prediction_value,
                        "model_version":result.model_version,
                        "confidence_score":result.confidence_score,
-                       "updated_at":str(result.Updated_at),
+                       "created_at":str(result.created_at),
                        "prediction_session_id":str(result.Prediction_Session_id)}
        return predict_result

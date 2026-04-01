@@ -11,7 +11,7 @@ class PredictionResult(SqlBaseModel):
     prediction_value=Column(String,nullable=False)
     model_version=Column(String,nullable=False)
     confidence_score=Column(FLOAT,nullable=False)
-    Updated_at=Column(DateTime(timezone=True),onupdate=func.now(),nullable=True)
+    created_at=Column(DateTime(timezone=True),server_default=func.now(),nullable=True)
     Prediction_Session_id=Column(UUID(as_uuid=True),ForeignKey("sessions.Session_id"),nullable=False)
     Prediction_Image_id = Column(UUID(as_uuid=True), ForeignKey("images.Image_id"))
     session = relationship("Session", back_populates="prediction_result")
