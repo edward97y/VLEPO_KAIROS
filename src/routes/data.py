@@ -8,8 +8,8 @@ from typing import List
 from uuid import UUID
 data_router=APIRouter(prefix="/api/data",tags=["data"])
 
-@data_router.post("/upload/eyeImage")
-async def upload_eye_image(images:List[UploadFile]=File(...),request:Request= None):
+@data_router.post("/upload/eyeImage/{session_id}")
+async def upload_eye_image(images:List[UploadFile]=File(...),request:Request=None,session_id:UUID=None):
 
    results=[]
    for image in images:
@@ -20,23 +20,24 @@ async def upload_eye_image(images:List[UploadFile]=File(...),request:Request= No
       if not valid:
         return JSONResponse(content={"Signal":signal},status_code=status.HTTP_400_BAD_REQUEST)
 
-      classifier=DeepEyeClassifier(content=content)
-      preprocessed_image=await classifier.preprocess()
+      classifier=DeepEyeClassifier(content=content,db_client=request.app.db_client,session_id=session_id)
+      preprocessed_image,image_id=await classifier.preprocess()
       if preprocessed_image is None:
         return JSONResponse(content={"signal":ResponseSignal.IMAGE_PREPROCESS_ERROR.value},status_code=status.HTTP_400_BAD_REQUEST)
+     
+      prediction_result,image_result=await classifier.predict(data=preprocessed_image,request=request,image_id=image_id)
 
-      image_prediction,confidence=await classifier.predict(data=preprocessed_image,request=request)
-
-      if image_prediction is None:
+      if prediction_result is None:
         return JSONResponse(content={"Signal":ResponseSignal.IMAGE_PREDICT_ERROR.value},status_code=status.HTTP_400_BAD_REQUEST)
       results.append({
             "filename": image.filename,
-            "prediction": image_prediction,
-            "confidence": confidence
+            "user_predict":prediction_result,
+            "user_image":image_result
         })
    return JSONResponse(
         content={
             "signal": ResponseSignal.IMAGE_PREDICT_SUCCESSFULLY.value,
+            "session_id":str(session_id),
             "results": results
         },
         status_code=status.HTTP_200_OK
@@ -56,5 +57,5 @@ async def upload_eye_feature(feature:EyeFeatureSchema,request:Request,session_id
 
   predict_result=await classifier.predict(preprocessed_feature=preprocessed_data,request=request)
   
-  return JSONResponse(content={"signal":ResponseSignal.FEATURE_PREDICT_SUCCESSFULLY.value,"session_id":str(session_id),"user_feature_table":feature_result,"user_prediction_table":predict_result},status_code=status.HTTP_200_OK)
+  return JSONResponse(content={"signal":ResponseSignal.FEATURE_PREDICT_SUCCESSFULLY.value,"session_id":str(session_id),"user_feature":feature_result,"user_prediction":predict_result},status_code=status.HTTP_200_OK)
   

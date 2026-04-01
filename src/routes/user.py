@@ -39,7 +39,7 @@ async def get_user_sessions(user_id:UUID, request: Request):
     if not user_sessions:
             return JSONResponse(content={"success": False, "signal": DataBaseResponseEnums.NO_SESSION_FOUND_FOR_THIS_USER.value},status_code=status.HTTP_400_BAD_REQUEST)
     
-    return JSONResponse(content={"success": True, "signal": DataBaseResponseEnums.GET_USER_SESSIONS_SUCCESSFULLY.value, "sessions": user_sessions,"user_id":str(user_id)},status_code=status.HTTP_200_OK)
+    return JSONResponse(content={"success": True, "signal": DataBaseResponseEnums.GET_USER_SESSIONS_SUCCESSFULLY.value,"user_id":str(user_id), "sessions": user_sessions},status_code=status.HTTP_200_OK)
 
 
 @user_router.delete("/delete_user_by_id/{user_id}")
