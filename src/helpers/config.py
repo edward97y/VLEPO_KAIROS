@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     POSTGRES_PORT:int
     POSTGRES_EYE_DATABASE:str
 
+
+    URLS:list
+    
     model_config = SettingsConfigDict(env_file=".env")
 
 def get_settings():

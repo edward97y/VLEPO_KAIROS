@@ -7,7 +7,7 @@ class DataBaseResponseEnums(Enum):
     GET_USER_INFO_SUCCESSFULLY="success"
     NO_SESSION_FOUND_FOR_THIS_USER="no session found for this user"
     GET_USER_SESSIONS_SUCCESSFULLY="get user session successfully"
-    ERROR_WHILE_DELETING_USER="error while deleting user (username doesn't exist)"
+    ERROR_WHILE_DELETING_USER="error while deleting user (user id doesn't exist)"
     USER_DELETED_SUCCESSFULLY="user deleted successfully"
     USER_DID_NOT_HAVE_INFO="user didn't have any information"
     
